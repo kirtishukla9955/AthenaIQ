@@ -1,0 +1,26 @@
+{
+  "name": "prooffund-backend",
+  "version": "1.0.0",
+  "description": "Backend for ProofFund: Decentralized idea protection and funding platform",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "deploy:contracts": "node scripts/deploy.js",
+    "setup:tigergraph": "node scripts/setup-tigergraph.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.6.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.10.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "pinata": "^1.1.2",
+    "solc": "^0.8.34"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
