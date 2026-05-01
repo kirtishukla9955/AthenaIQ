@@ -17,27 +17,41 @@ const FUNDING_DAO_ABI = [
 
 class BlockchainService {
     constructor() {
-        this.provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-        this.wallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
-        
-        if (process.env.IDEA_REGISTRY_ADDRESS) {
-            this.ideaRegistry = new ethers.Contract(
-                process.env.IDEA_REGISTRY_ADDRESS,
-                IDEA_REGISTRY_ABI,
-                this.wallet
-            );
-        }
+        // Guard: only init provider/wallet if env vars exist
+        if (process.env.RPC_URL && process.env.PRIVATE_KEY) {
+            try {
+                this.provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+                this.wallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
 
-        if (process.env.FUNDING_DAO_ADDRESS) {
-            this.fundingDAO = new ethers.Contract(
-                process.env.FUNDING_DAO_ADDRESS,
-                FUNDING_DAO_ABI,
-                this.wallet
-            );
+                if (process.env.IDEA_REGISTRY_ADDRESS) {
+                    this.ideaRegistry = new ethers.Contract(
+                        process.env.IDEA_REGISTRY_ADDRESS,
+                        IDEA_REGISTRY_ABI,
+                        this.wallet
+                    );
+                }
+
+                if (process.env.FUNDING_DAO_ADDRESS) {
+                    this.fundingDAO = new ethers.Contract(
+                        process.env.FUNDING_DAO_ADDRESS,
+                        FUNDING_DAO_ABI,
+                        this.wallet
+                    );
+                }
+
+                console.log("BlockchainService: connected to RPC");
+            } catch (err) {
+                console.warn("BlockchainService: failed to init provider:", err.message);
+                this.provider = null;
+                this.wallet = null;
+            }
+        } else {
+            console.warn("BlockchainService: RPC_URL or PRIVATE_KEY not set — running in mock mode");
+            this.provider = null;
+            this.wallet = null;
         }
     }
 
-    // Auth
     verifySignature(walletAddress, signature, message) {
         try {
             const recoveredAddress = ethers.verifyMessage(message, signature);
@@ -48,14 +62,12 @@ class BlockchainService {
         }
     }
 
-    // Registry
     async commitIdea(fileHashHex) {
         if (!this.ideaRegistry) {
-            console.warn("IdeaRegistry contract not configured, skipping on-chain commit.");
+            console.warn("IdeaRegistry not configured, using mock.");
             return { hash: "0xmocktxhash" };
         }
         try {
-            // fileHash is expected to be a 64 char hex string (32 bytes)
             const hash32 = "0x" + fileHashHex;
             const tx = await this.ideaRegistry.commitIdea(hash32);
             await tx.wait();
@@ -67,23 +79,17 @@ class BlockchainService {
     }
 
     async verifyIdea(fileHashHex) {
-        if (!this.ideaRegistry) {
-            return null; // fallback will be handled in route
-        }
+        if (!this.ideaRegistry) return null;
         try {
             const hash32 = "0x" + fileHashHex;
             const [owner, timestamp] = await this.ideaRegistry.verifyIdea(hash32);
-            return {
-                owner,
-                timestamp: Number(timestamp) * 1000 // Convert sec to ms
-            };
+            return { owner, timestamp: Number(timestamp) * 1000 };
         } catch (error) {
-            console.error("verifyIdea on-chain err (or not found):", error.message);
+            console.error("verifyIdea error:", error.message);
             return null;
         }
     }
 
-    // DAO
     async vote(proposalId, support) {
         if (!this.fundingDAO) return { hash: "0xmocktxhash" };
         const tx = await this.fundingDAO.vote(proposalId, support);

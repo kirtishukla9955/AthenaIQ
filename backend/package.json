@@ -18,7 +18,8 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "pinata": "^1.1.2",
-    "solc": "^0.8.34"
+    "solc": "^0.8.34",
+    "mongoose": "^8.4.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
