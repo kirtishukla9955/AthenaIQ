@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Sentient';
+  src: url('/Sentient-Extralight.woff') format('woff');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sentient';
+  src: url('/Sentient-LightItalic.woff') format('woff');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+  --primary: #007BFF;
+  --primary-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.15);
+  --muted: rgba(255, 255, 255, 0.6);
+  --card: rgba(0, 0, 0, 0.02);
+  --card-border: rgba(255, 255, 255, 0.15);
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+
+  @media (width >= 768px) {
+    padding-inline: 2rem;
+  }
+
+  @media (width >= 1280px) {
+    padding-inline: 3rem;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-card-border: var(--card-border);
+
+  --font-mono: var(--font-geist-mono);
+  --font-sentient: 'Sentient', sans-serif;
+
+  --shadow-glow: 0 0 8px 2px var(--tw-shadow-color);
+  --shadow-glow-lg: 0 0 30px 10px var(--tw-shadow-color);
+  --shadow-glow-xl: 0 0 60px 20px var(--tw-shadow-color);
+  --shadow-azure: 0 0 30px 8px rgba(0, 123, 255, 0.4);
+  --shadow-azure-sm: 0 0 15px 4px rgba(0, 123, 255, 0.3);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* WebGL canvas - used by both landing and dashboard */
+#webgl {
+  top: 0;
+  left: 0;
+  position: fixed;
+  height: 100svh;
+  width: 100%;
+  z-index: 0;
+}
+
+#webgl canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Glass card effect - used in AURA_01 dashboard pages */
+.glass-card {
+  background: rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+}
+
+/* Azure glow effects */
+.azure-glow {
+  box-shadow: 0 0 30px 5px rgba(0, 123, 255, 0.3);
+}
+
+.azure-glow-subtle {
+  box-shadow: 0 0 15px 2px rgba(0, 123, 255, 0.2);
+}
+
+/* Button glow */
+.btn-glow {
+  box-shadow: 0 0 20px 4px rgba(0, 123, 255, 0.4);
+  transition: box-shadow 0.3s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 30px 8px rgba(0, 123, 255, 0.6);
+}
+
+/* Progress bar glow */
+.progress-glow {
+  box-shadow: 0 0 10px 2px rgba(0, 123, 255, 0.5);
+}
+
+/* Input glow on focus */
+.input-azure:focus {
+  box-shadow: 0 0 15px 3px rgba(0, 123, 255, 0.3);
+  border-color: #007BFF;
+}
+
+/* Pulse animation for wallet */
+@keyframes azure-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px 3px rgba(0, 123, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 25px 6px rgba(0, 123, 255, 0.6);
+  }
+}
+
+.pulse-azure {
+  animation: azure-pulse 2s ease-in-out infinite;
+}
+
+/* Spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
