@@ -113,4 +113,52 @@ router.post("/:id/fund", authenticateToken, async (req, res) => {
     }
 });
 
+router.post("/", authenticateToken, async (req, res) => {
+    try {
+        const { title, description, requestedAmount } = req.body;
+        const userWallet = req.user.walletAddress;
+
+        if (!title || !requestedAmount) {
+            return res.status(400).json({ error: "title and requestedAmount are required" });
+        }
+
+        const amountWei = (parseFloat(requestedAmount) * 1e18).toString();
+
+        const newProposal = {
+            id: db.proposals.length + 1,
+            title,
+            description: description || "",
+            creator: userWallet,
+            totalFunds: "0",
+            targetFunds: amountWei,
+            yesVotes: 0,
+            noVotes: 0,
+            active: true,
+            milestones: [
+                { percentage: 33, released: false, approved: false },
+                { percentage: 33, released: false, approved: false },
+                { percentage: 34, released: false, approved: false }
+            ],
+            ipfsHash: "",
+            timestamp: Date.now(),
+        };
+
+        db.proposals.push(newProposal);
+
+        db.activities.unshift({
+            id: `act-${Date.now()}`,
+            type: "PROPOSAL_CREATED",
+            description: `Created proposal '${newProposal.title}'`,
+            walletAddress: userWallet,
+            timestamp: Date.now(),
+            txHash: "0xnew"
+        });
+
+        res.status(201).json(newProposal);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error creating proposal" });
+    }
+});
+
 module.exports = router;

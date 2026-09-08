@@ -128,43 +128,8 @@ const SEED_ACTIVITIES = [
 
 // ── In-memory store (always available) ──────────────────────────────────────
 const db = {
-<<<<<<< HEAD
-    vaultItems: [
-        {
-            id: "vlt-101",
-            title: "Gen-Z DeFi Strategy",
-            description: "Automated yields for small wallets.",
-            fileHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            ipfsUrl: "ipfs://QmXYZ123",
-            txHash: "0xabc123",
-            timestamp: Date.now() - 86400000 * 2, // 2 days ago
-            verified: true,
-            ownerAddress: "0xMockUserAddress" 
-        }
-    ],
-    proposals: [
-        {
-            id: 1,
-            title: "Decentralized Carbon Credit Oracle",
-            description: "Connecting IoT sensors directly to Polygon via API3.",
-            creator: "0x1234567890abcdef1234567890abcdef12345678",
-            totalFunds: "1000000000000000000", // 1 ETH in Wei
-            yesVotes: 15,
-            noVotes: 2,
-            active: true,
-            milestones: [
-                { percentage: 30, released: true, approved: true },
-                { percentage: 40, released: false, approved: false },
-                { percentage: 30, released: false, approved: false }
-            ],
-            ipfsHash: "QmOracleIPFS",
-            timestamp: Date.now() - 86400000 * 5,
-        }
-    ],
-=======
     vaultItems: [...SEED_VAULT],
     proposals: JSON.parse(JSON.stringify(SEED_PROPOSALS)),
->>>>>>> acc6aee (fix: crash-safe blockchain, dynamic CORS, MongoDB persistence)
     verifications: [
         {
             id: "ver-1",

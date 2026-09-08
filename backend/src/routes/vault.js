@@ -1,4 +1,5 @@
 const express = require("express");
+const networkRoute = require("./network");
 const authenticateToken = require("../middleware/auth");
 const db = require("../db");
 const ipfsService = require("../services/ipfs");
@@ -75,6 +76,14 @@ router.post("/", authenticateToken, async (req, res) => {
         );
 
         // Record Activity
+        // Broadcast real-time graph update to all SSE clients
+        try {
+            networkRoute.broadcastGraphEvent("node_added", {
+                node: { id: newItem.id, label: newItem.title, type: "core", x: 30 + Math.random() * 40, y: 30 + Math.random() * 40, connections: 1, detail: newItem.description || "" },
+                edge: { from: "core-1", to: newItem.id, weight: 0.5 }
+            });
+        } catch (_) {}
+
         db.activities.unshift({
             id: `act-${Date.now()}`,
             type: "IDEA_COMMITTED",
