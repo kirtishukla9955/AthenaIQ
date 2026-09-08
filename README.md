@@ -102,4 +102,4 @@ The platform operates on the **Polygon Amoy Testnet** using two primary smart co
 *(Placeholder - Add your names, roles, and GitHub profiles here)*
 
 ## License
-*(Placeholder - e.g., MIT License)*
+This project is licensed under the [MIT License](LICENSE).
