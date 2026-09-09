@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { setToken } from "@/lib/api";
 
+import { ethers } from "ethers";
 import { SiweMessage, generateNonce } from "siwe";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
@@ -35,7 +36,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const accounts: string[] = await (window as any).ethereum.request({
           method: "eth_requestAccounts",
         });
-        address = accounts[0];
+        
+        // EIP-55 checksum the address to satisfy siwe parser
+        address = ethers.getAddress(accounts[0]);
         setAuthState("verifying");
 
         const domain = window.location.host;
@@ -43,21 +46,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const chainIdHex = await (window as any).ethereum.request({ method: "eth_chainId" });
         const chainId = parseInt(chainIdHex, 16);
 
-        const siweMessage = new SiweMessage({
-          domain,
-          address,
-          statement: "Sign in to the ProofFund Protocol.",
-          uri: origin,
-          version: "1",
-          chainId,
-          nonce: generateNonce(),
-        });
+        let siweMessage;
+        try {
+          siweMessage = new SiweMessage({
+            domain,
+            address,
+            statement: "Sign in to the ProofFund Protocol.",
+            uri: origin,
+            version: "1",
+            chainId,
+            nonce: generateNonce(),
+          });
+        } catch (error) {
+          throw new Error("Failed to construct SIWE message. Invalid address format.");
+        }
         
         message = siweMessage.prepareMessage();
 
         signature = await (window as any).ethereum.request({
           method: "personal_sign",
-          params: [message, address],
+          params: [message, accounts[0]], // MetaMask personal_sign works best with the original unchecksummed address sometimes, but checksummed is fine too
         });
       } else {
         // ── Mock fallback (no MetaMask installed) ───────────────────────
@@ -95,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAuthState("connected");
     } catch (err) {
       console.error("Connection failed:", err);
+      alert("Wallet connection failed, please try again");
       setAuthState("disconnected");
     }
   }, []);
