@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { setToken } from "@/lib/api";
 
+import { SiweMessage, generateNonce } from "siwe";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 type AuthState = "disconnected" | "connecting" | "verifying" | "connected";
@@ -36,7 +38,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         address = accounts[0];
         setAuthState("verifying");
 
-        message = `Sign in to ProofFund: ${Date.now()}`;
+        const domain = window.location.host;
+        const origin = window.location.origin;
+        const chainIdHex = await (window as any).ethereum.request({ method: "eth_chainId" });
+        const chainId = parseInt(chainIdHex, 16);
+
+        const siweMessage = new SiweMessage({
+          domain,
+          address,
+          statement: "Sign in to the ProofFund Protocol.",
+          uri: origin,
+          version: "1",
+          chainId,
+          nonce: generateNonce(),
+        });
+        
+        message = siweMessage.prepareMessage();
+
         signature = await (window as any).ethereum.request({
           method: "personal_sign",
           params: [message, address],

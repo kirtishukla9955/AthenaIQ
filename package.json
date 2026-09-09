@@ -23,6 +23,7 @@
     "r3f-perf": "latest",
     "react": "^19",
     "react-dom": "^19",
+    "siwe": "^3.0.0",
     "tailwind-merge": "^2.5.5",
     "three": "latest"
   },
